@@ -3,10 +3,11 @@
 <p align="center">
   <img src="https://img.shields.io/badge/PHP-8.1+-777bb4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
   <img src="https://img.shields.io/badge/PostgreSQL-latest-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="Postgres">
-  <img src="https://img.shields.io/badge/Security-AES--256--RSA-success?style=for-the-badge" alt="Security">
+  <img src="https://img.shields.io/badge/Security-AES--256--CBC-blue?style=for-the-badge" alt="AES">
+  <img src="https://img.shields.io/badge/Security-RSA--2048-success?style=for-the-badge" alt="RSA">
 </p>
 
-**SecureCloud** est une solution de stockage cloud hautement sécurisée basée sur un modèle de **chiffrement hybride**. L'application garantit une confidentialité totale : seul le propriétaire (ou les destinataires autorisés) peut accéder au contenu des fichiers.
+**SecureCloud** est une solution de stockage cloud sécurisée basée sur un modèle de **chiffrement hybride**. L'application garantit une confidentialité totale : seul le propriétaire (ou les destinataires autorisés) peut accéder au contenu des fichiers.
 
 ---
 
@@ -15,14 +16,14 @@
 Le projet implémente les standards de l'industrie pour assurer une confidentialité **"Zero-Knowledge"** :
 
 * **Authentification** : Hachage des mots de passe avec **Bcrypt** pour protéger les accès.
-* **Chiffrement des données** : Utilisation de **AES-256-CBC** pour le contenu des fichiers.
-* **Gestion des identités** : Paire de clés **RSA-2048** par utilisateur.
-* **Protection des clés** : La clé privée RSA est chiffrée par le secret (mot de passe) de l'utilisateur.
+* **Chiffrement Symétrique** : Utilisation de **AES-256-CBC** pour le contenu des fichiers.
+* **Chiffrement Asymétrique** : Paire de clés **RSA-2048** par utilisateur pour le scellage des clés AES.
+* **Protection des clés** : La clé privée RSA est elle-même chiffrée par le mot de passe de l'utilisateur.
 
 ### 🔄 Flux de Chiffrement Hybride
 Le système utilise le principe de l'enveloppe numérique :
-1. Le fichier $F$ est chiffré par une **Clé AES** unique $K$ : $$C = E_{AES}(F, K)$$
-2. La Clé AES est "scellée" par la **Clé Publique RSA** de l'utilisateur ($Pub_{u}$) : $$K_{sealed} = E_{RSA}(K, Pub_{u})$$
+1. Le fichier $F$ est chiffré par une **Clé AES** unique $K$ : $$C = E_{AES\_256\_CBC}(F, K, IV)$$
+2. La Clé AES est "scellée" (chiffrée) par la **Clé Publique RSA** de l'utilisateur ($Pub_{u}$) : $$K_{sealed} = E_{RSA\_2048}(K, Pub_{u})$$
 
 ---
 
@@ -38,11 +39,11 @@ cd R4C08
 Importez le fichier `database.sql` dans votre instance PostgreSQL pour créer les tables `UTILISATEUR`, `FICHIER` et `EST_PARTAGE_AVEC`.
 
 ### 3. Variables d'environnement
-Créez le fichier `config/database.php` (ce fichier est ignoré par Git pour la sécurité) :
+Créez le fichier `config/database.php` (ignoré par Git) :
 
 ```php
 <?php
-$host = 'votre_host';
+$host = 'localhost';
 $db   = 'votre_db';
 $user = 'votre_user';
 $pass = 'votre_pass';
@@ -59,10 +60,10 @@ try {
 
 ## 🚀 Fonctionnalités Utilisateur
 
-- [x] **Explorateur de fichiers** : Navigation par arborescence dans la barre latérale.
-- [x] **Partage sécurisé** : Envoi de fichiers par pseudo utilisateur.
-- [x] **Menu Contextuel** : Actions rapides (Télécharger, Partager, Supprimer) via menu "trois points".
-- [x] **Zone de danger** : Suppression définitive du compte et des données physiques associées.
+- [x] **Explorateur de fichiers** : Navigation par arborescence.
+- [x] **Partage sécurisé** : Re-chiffrement de clé par RSA.
+- [x] **Menu Contextuel** : Téléchargement, Partage et Suppression.
+- [x] **Zone de danger** : Suppression intégrale du compte et des fichiers physiques `.enc`.
 
 ---
 
