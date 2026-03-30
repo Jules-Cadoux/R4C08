@@ -1,0 +1,10 @@
+# Ne pas envoyer les identifiants de la DB
+config/database.php
+
+# Ne pas envoyer les fichiers chiffrés stockés sur le serveur
+uploads/*
+!uploads/.gitkeep
+
+# Fichiers système
+.DS_Store
+Thumbs.db
