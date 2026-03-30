@@ -46,6 +46,20 @@ $db   = 'votre_base';
 $user = 'votre_user';
 $pass = 'votre_password';
 ?>
+$dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, 
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       
+    PDO::ATTR_EMULATE_PREPARES   => false,                  
+];
+
+try {
+    $pdo = new PDO($dsn, $username, $password, $options);
+} catch (\PDOException $e) {
+    die("Erreur critique : Impossible de se connecter à la base Alwaysdata. Détail : " . $e->getMessage());
+}
+?>
 ```
 
 ---
