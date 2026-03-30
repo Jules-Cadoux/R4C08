@@ -1,69 +1,61 @@
-# 🛡️ SecureCloud 
+# 🛡️ SecureCloud - Déploiement Alwaysdata
 
 <p align="center">
   <img src="https://img.shields.io/badge/PHP-8.1+-777bb4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
-  <img src="https://img.shields.io/badge/PostgreSQL-latest-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="Postgres">
+  <img src="https://img.shields.io/badge/PostgreSQL-Alwaysdata-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="Postgres">
   <img src="https://img.shields.io/badge/Security-AES--256--CBC-blue?style=for-the-badge" alt="AES">
   <img src="https://img.shields.io/badge/Security-RSA--2048-success?style=for-the-badge" alt="RSA">
 </p>
 
-**SecureCloud** est une solution de stockage cloud sécurisée basée sur un modèle de **chiffrement hybride**. L'application garantit une confidentialité totale : seul le propriétaire (ou les destinataires autorisés) peut accéder au contenu des fichiers.
+**SecureCloud** est une solution de stockage cloud sécurisée déployée sur Alwaysdata, basée sur un modèle de **chiffrement hybride**. L'application garantit une confidentialité totale : seul le propriétaire peut accéder au contenu de ses fichiers.
 
 ---
 
 ## 🔒 Architecture de Sécurité
 
-Le projet implémente les standards de l'industrie pour assurer une confidentialité **"Zero-Knowledge"** :
+Le projet assure une confidentialité **"Zero-Knowledge"** :
 
-* **Authentification** : Hachage des mots de passe avec **Bcrypt** pour protéger les accès.
-* **Chiffrement Symétrique** : Utilisation de **AES-256-CBC** pour le contenu des fichiers.
-* **Chiffrement Asymétrique** : Paire de clés **RSA-2048** par utilisateur pour le scellage des clés AES.
-* **Protection des clés** : La clé privée RSA est elle-même chiffrée par le mot de passe de l'utilisateur.
+* **Authentification** : Hachage des mots de passe avec **Bcrypt**.
+* **Chiffrement Symétrique** : **AES-256-CBC** pour les fichiers.
+* **Chiffrement Asymétrique** : **RSA-2048** pour le scellage des clés de session.
+* **Protection** : La clé privée RSA est stockée chiffrée par le mot de passe de l'utilisateur.
 
-### 🔄 Flux de Chiffrement Hybride
-Le système utilise le principe de l'enveloppe numérique :
-1. Le fichier $F$ est chiffré par une **Clé AES** unique $K$ : $$C = E_{AES\_256\_CBC}(F, K, IV)$$
-2. La Clé AES est "scellée" (chiffrée) par la **Clé Publique RSA** de l'utilisateur ($Pub_{u}$) : $$K_{sealed} = E_{RSA\_2048}(K, Pub_{u})$$
+### 🔄 Flux Cryptographique
+1. Le fichier $F$ est chiffré par une **Clé AES** unique $K$ : $$C = E_{AES}(F, K)$$
+2. La Clé AES est scellée par la **Clé Publique RSA** de l'utilisateur ($Pub_{u}$) : $$K_{sealed} = E_{RSA}(K, Pub_{u})$$
 
 ---
 
-## 🛠️ Installation
+## 🛠️ Configuration du Projet
 
-### 1. Cloner le projet
-```bash
-git clone [https://github.com/Jules-Cadoux/R4C08.git](https://github.com/Jules-Cadoux/R4C08.git)
-cd R4C08
-```
+### 1. Structure de la Base de Données
+Le système repose sur trois tables principales configurées sur l'instance PostgreSQL d'Alwaysdata :
+* `UTILISATEURS` : Stockage des identifiants et des paires de clés RSA.
+* `FICHIER` : Métadonnées des fichiers et clés AES scellées.
+* `EST_PARTAGE_AVEC` : Gestion des accès tiers par re-chiffrement RSA.
 
-### 2. Configurer la base de données
-Importez le fichier `database.sql` dans votre instance PostgreSQL pour créer les tables `UTILISATEUR`, `FICHIER` et `EST_PARTAGE_AVEC`.
+*Référence : Voir le diagramme de classe pour le détail des champs.*
 
-### 3. Variables d'environnement
-Créez le fichier `config/database.php` (ignoré par Git) :
+### 2. Variables d'environnement
+Le fichier `config/database.php` (exclu du dépôt pour la sécurité) contient les accès distants à Alwaysdata :
 
 ```php
 <?php
-$host = 'localhost';
-$db   = 'votre_db';
+$host = 'postgresql-votre-compte.alwaysdata.net';
+$db   = 'votre_base';
 $user = 'votre_user';
-$pass = 'votre_pass';
-
-try {
-    $pdo = new PDO("pgsql:host=$host;dbname=$db", $user, $pass);
-} catch (PDOException $e) {
-    die("Erreur : " . $e->getMessage());
-}
+$pass = 'votre_password';
 ?>
 ```
 
 ---
 
-## 🚀 Fonctionnalités Utilisateur
+## 🚀 Fonctionnalités Opérationnelles
 
-- [x] **Explorateur de fichiers** : Navigation par arborescence.
-- [x] **Partage sécurisé** : Re-chiffrement de clé par RSA.
-- [x] **Menu Contextuel** : Téléchargement, Partage et Suppression.
-- [x] **Zone de danger** : Suppression intégrale du compte et des fichiers physiques `.enc`.
+- [x] **Explorateur** : Navigation par arborescence (Sidebar).
+- [x] **Partage** : Envoi sécurisé par scellage RSA du destinataire.
+- [x] **Menu Contextuel** : Actions rapides sur les fichiers.
+- [x] **Droit à l'oubli** : Suppression intégrale du compte et des fichiers physiques associés.
 
 ---
 
